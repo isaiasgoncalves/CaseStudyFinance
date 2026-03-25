@@ -11,5 +11,13 @@ o agente de IA para me auxiliar na elaboração do projeto.
 De fato, não tenho muitos conhecimentos sobre análise de dados no Mercado Financeiro, então vejo aqui uma grande oportunidade
 para aprender e colocar esses conhecimentos em prática
 
+### Fase 1
+
+Aqui vamos utilizar sobretudo a biblioteca `yfinance` para fazer a coleta dos dados desejado para cada empresa.
+Antes de tudo, configuramos o ambiente com o arquivo `requirements.txt` e inserimos a base do que vai ser nosso sistema
+de _logging_. 
+
+Criamos o módulo `core` com o script `collector.py` onde são declaradas as classes para coleta de dados a partir dos tickers
+desejados. Aproveitamos para criar o diretório `tests` com os primeiros testes unitários em `test_collector.py`
 
 
