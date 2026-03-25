@@ -82,17 +82,21 @@ Prefira profundidade à amplitude. Fontes de dados devem ser públicas e gratuit
 * **Logging:** Centralizado em `utils/logger.py` para rastreabilidade de erros e monitoramento do pipeline.
 * **Commits:** Progressivos e granulares por funcionalidade/módulo.
 
-### FASE 1: Plano de Ação
-1. **Setup Inicial:** Configuração de ambiente (`requirements.txt`) e logger profissional.
-2. **Coleta de Dados (`collector.py`):**
-    * Integração com `yfinance` para dados de mercado e indicadores.
-    * Fallback/Scraping se necessário para indicadores brasileiros específicos.
-    * Notícias via `yfinance` ou `NewsAPI`.
-3. **Módulo de IA (`analyzer.py`):**
-    * Integração com LLM (OpenAI/Gemini).
-    * Prompts estruturados com foco em *Value Investing*.
-4. **Interface (`app.py`):**
-    * Dashboard funcional com Streamlit.
+### FASE 1: Progresso e Decisões Técnicas
+1. **Setup Inicial (Concluído):** 
+    * Ambiente configurado com `requirements.txt` e `venvproj`.
+    * Logger profissional implementado em `utils/logger.py` (Console + File).
+2. **Coleta de Dados (Concluído):**
+    * Módulo `core/collector.py` integrado ao Yahoo Finance via `yfinance`.
+    * **Desafio Técnico:** Erro SSL (`curl 77`) no Windows devido a caracteres especiais no path ("Isaías").
+    * **Solução:** Implementação de sessões via `curl_cffi` com bypass de verificação SSL para garantir portabilidade em qualquer ambiente Windows.
+3. **Testes e Qualidade (Concluído):**
+    * Estrutura de testes unitários com `pytest` e `unittest.mock` em `tests/test_collector.py`.
+    * Garantia de funcionamento do pipeline mesmo sob *rate limit* de APIs externas.
+
+### FASE 1: Próximos Passos
+1. **Módulo de IA (`analyzer.py`):** Integração com LLM para síntese de Value Investing.
+2. **Interface (`app.py`):** Dashboard Streamlit.
 
 ### FASE 2: Persistência e Robustez
 1. **Banco de Dados (`database.py`):** SQLite para histórico de cotações e análises.
