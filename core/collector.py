@@ -14,9 +14,10 @@ class DataCollector:
         # Garante que o ticker termine com .SA para B3
         self.ticker_symbol = ticker.upper() if ticker.upper().endswith(".SA") else f"{ticker.upper()}.SA"
         
-        # Cria uma sessão do curl_cffi (exigida pelas versões novas do yfinance)
+        # Cria uma sessão do curl_cffi mimetizando um navegador Chrome real
+        # impersonate="chrome" ajuda a evitar o erro "Too Many Requests"
         # verify=False contorna o erro de path com caracteres especiais (curl 77)
-        session = requests_cffi.Session(verify=False)
+        session = requests_cffi.Session(impersonate="chrome", verify=False)
         
         self.ticker = yf.Ticker(self.ticker_symbol, session=session)
 
