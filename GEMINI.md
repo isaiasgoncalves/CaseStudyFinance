@@ -82,28 +82,31 @@ Prefira profundidade à amplitude. Fontes de dados devem ser públicas e gratuit
 * **Logging:** Centralizado em `utils/logger.py` para rastreabilidade de erros e monitoramento do pipeline.
 * **Commits:** Progressivos e granulares por funcionalidade/módulo.
 
-### FASE 1: Progresso e Decisões Técnicas
-1. **Setup Inicial (Concluído):** 
-    * Ambiente configurado com `requirements.txt` e `venvproj`.
-    * Logger profissional em `utils/logger.py`.
-2. **Coleta de Dados (Concluído):**
-    * Módulo `core/collector.py`: Extração de dados cadastrais, indicadores e notícias via `yfinance`.
-    * **Resiliência:** Uso de `curl_cffi` com `impersonate="chrome"` para mimetizar navegadores reais e contornar bloqueios de IP (*Rate Limit*) e erros de SSL em caminhos com caracteres especiais.
-3. **Módulo de IA & Prompts (Concluído):**
-    * Módulo `core/analyzer.py`: Integração com OpenAI (GPT-4o) utilizando o modo `json_object` para garantir saídas estruturadas.
-    * Módulo `core/prompts.py`: Repositório centralizado de prompts, facilitando a iteração na filosofia de *Value Investing*.
-4. **Testes e Qualidade (Concluído):**
-    * Cobertura de testes unitários em `tests/` com mocks completos, permitindo desenvolvimento offline e seguro.
+# Status do Projeto: Hipótese Capital - Terminal Analítico
 
-## Funcionamento do Pipeline (Fase 1)
-O pipeline opera em três camadas distintas:
-1. **Camada de Extração:** O `DataCollector` normaliza o ticker (adicionando `.SA`) e utiliza uma sessão TLS customizada para coletar dados brutos do Yahoo Finance.
-2. **Camada de Processamento:** O `InvestmentAnalyzer` consome o template de prompt, injeta os dados reais e solicita ao LLM uma síntese técnica sob a persona de um analista sênior.
-3. **Camada de Orquestração:** O script `run_analysis.py` conecta as pontas, tratando erros de cada etapa e exibindo o relatório final.
+## 1. Conquistas da Fase 1 (Sprints 1 a 4)
+O projeto automatizou com sucesso a coleta e análise de dados para um analista sênior da Hipótese Capital.
+- **Pipeline de Dados:** Coleta robusta de dados cadastrais, indicadores fundamentalistas e notícias (Bypass de SSL e Rate Limit implementados com `curl_cffi` e `impersonate="chrome"`).
+- **Inteligência Analítica:** Integração com OpenAI (GPT-4o) utilizando prompts especializados em *Value Investing*.
+- **Interface Visual:** Dashboard Streamlit sofisticado com fontes serifadas, suporte a temas (Claro/Escuro), métricas contrastantes e gráficos quantitativos.
+- **Qualidade de Software:** Suite de testes unitários com mocks completos, permitindo desenvolvimento offline.
 
-### FASE 1: Próximos Passos
-1. **Interface (`app.py`):** Criação do Dashboard interativo com Streamlit.
+## 2. Visão Técnica (Handover para Próxima Sessão)
+### Stack Atual
+- Python 3.x, Streamlit, yfinance, curl_cffi, OpenAI, Pytest.
+- **Resiliência:** O `DataCollector` lida com caminhos de pasta contendo caracteres especiais e rate limits de API.
+- **Prompts:** Estão isolados em `core/prompts.py` para fácil ajuste da tese de investimento.
 
-### FASE 2: Persistência e Robustez
-1. **Banco de Dados (`database.py`):** SQLite para histórico de cotações e análises.
-2. **Histórico:** Garantir que consultas subsequentes permitam comparação histórica no dashboard.
+### Desafios Identificados
+- **Notícias:** A API do Yahoo Finance é instável para títulos; o fallback via Google News RSS é a solução atual.
+- **Gráficos:** Atualmente focados em preço (12m), mas há demanda por mais dados quantitativos visuais.
+
+## 3. Road Map para Fase 2 (Pipeline Robusto e Persistência)
+O próximo passo é dar "memória" ao sistema para que o analista possa comparar o histórico de uma empresa:
+1. **Banco de Dados:** Implementar `core/database.py` usando SQLite.
+2. **Modelagem:** Separar dados estáticos (Perfil) de dados dinâmicos (Cotações e Indicadores por data).
+3. **Persistência:** Modificar o pipeline para que cada rodada salve os dados no banco sem sobrescrever o passado.
+4. **Dashboard Histórico:** Adicionar gráficos que mostrem a evolução do P/L ou ROE da empresa ao longo do tempo (obtendo esses dados do banco).
+
+---
+*Instrução para IA:* Ao iniciar a Fase 2, foque primeiro na criação da classe `DatabaseManager` e na adaptação do `app.py` para ler dados históricos.
