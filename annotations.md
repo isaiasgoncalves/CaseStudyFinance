@@ -20,4 +20,6 @@ de _logging_.
 Criamos o módulo `core` com o script `collector.py` onde são declaradas as classes para coleta de dados a partir dos tickers
 desejados. Aproveitamos para criar o diretório `tests` com os primeiros testes unitários em `test_collector.py`
 
+O próximo passo agora é criar os recursos de IA para interpretação dos dados e criação de relatórios subjetivos.
+
 
