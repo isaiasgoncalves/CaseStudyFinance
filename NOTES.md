@@ -20,6 +20,9 @@ de _logging_.
 Criamos o módulo `core` com o script `collector.py` onde são declaradas as classes para coleta de dados a partir dos tickers
 desejados. Aproveitamos para criar o diretório `tests` com os primeiros testes unitários em `test_collector.py`
 
-O próximo passo agora é criar os recursos de IA para interpretação dos dados e criação de relatórios subjetivos.
+O próximo passo agora é criar os recursos de IA para interpretação dos dados e criação de relatórios subjetivos. Utilizamos
+os modelos ChatGPT da OpenAI para fazer a análise, e configuramos um arquivo para deixar os prompts, sabendo que podem ser
+aprimorados para obter uma análise ainda mais precisa e útil considerando o contexto do projeto
+
 
 

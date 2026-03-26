@@ -85,19 +85,25 @@ Prefira profundidade à amplitude. Fontes de dados devem ser públicas e gratuit
 ### FASE 1: Progresso e Decisões Técnicas
 1. **Setup Inicial (Concluído):** 
     * Ambiente configurado com `requirements.txt` e `venvproj`.
-    * Logger profissional implementado em `utils/logger.py` (Console + File).
+    * Logger profissional em `utils/logger.py`.
 2. **Coleta de Dados (Concluído):**
-    * Módulo `core/collector.py` integrado ao Yahoo Finance via `yfinance`.
-    * **Desafio Técnico:** Erro SSL (`curl 77`) no Windows devido a caracteres especiais no path ("Isaías").
-    * **Solução:** Implementação de sessões via `curl_cffi` com bypass de verificação SSL para garantir portabilidade em qualquer ambiente Windows.
-3. **Testes e Qualidade (Concluído):**
-    * Estrutura de testes unitários com `pytest` e `unittest.mock` em `tests/test_collector.py`.
-    * Garantia de funcionamento do pipeline mesmo sob *rate limit* de APIs externas.
+    * Módulo `core/collector.py`: Extração de dados cadastrais, indicadores e notícias via `yfinance`.
+    * **Resiliência:** Uso de `curl_cffi` com `impersonate="chrome"` para mimetizar navegadores reais e contornar bloqueios de IP (*Rate Limit*) e erros de SSL em caminhos com caracteres especiais.
+3. **Módulo de IA & Prompts (Concluído):**
+    * Módulo `core/analyzer.py`: Integração com OpenAI (GPT-4o) utilizando o modo `json_object` para garantir saídas estruturadas.
+    * Módulo `core/prompts.py`: Repositório centralizado de prompts, facilitando a iteração na filosofia de *Value Investing*.
+4. **Testes e Qualidade (Concluído):**
+    * Cobertura de testes unitários em `tests/` com mocks completos, permitindo desenvolvimento offline e seguro.
+
+## Funcionamento do Pipeline (Fase 1)
+O pipeline opera em três camadas distintas:
+1. **Camada de Extração:** O `DataCollector` normaliza o ticker (adicionando `.SA`) e utiliza uma sessão TLS customizada para coletar dados brutos do Yahoo Finance.
+2. **Camada de Processamento:** O `InvestmentAnalyzer` consome o template de prompt, injeta os dados reais e solicita ao LLM uma síntese técnica sob a persona de um analista sênior.
+3. **Camada de Orquestração:** O script `run_analysis.py` conecta as pontas, tratando erros de cada etapa e exibindo o relatório final.
 
 ### FASE 1: Próximos Passos
-1. **Módulo de IA (`analyzer.py`):** Integração com LLM para síntese de Value Investing.
-2. **Interface (`app.py`):** Dashboard Streamlit.
+1. **Interface (`app.py`):** Criação do Dashboard interativo com Streamlit.
 
 ### FASE 2: Persistência e Robustez
 1. **Banco de Dados (`database.py`):** SQLite para histórico de cotações e análises.
-2. **Tratamento de Exceções:** Retries para APIs e validação rigorosa de inputs.
+2. **Histórico:** Garantir que consultas subsequentes permitam comparação histórica no dashboard.
