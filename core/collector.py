@@ -71,9 +71,69 @@ class DataCollector:
         }
 
     def _get_recent_news(self, limit: int = 5) -> list:
-        """Coleta notícias recentes vinculadas ao ticker."""
-        news = self.ticker.news
-        return news[:limit] if news else []
+        """
+        Coleta notícias recentes de forma ultra-resiliente.
+        """
+        news = []
+        # 1. Tenta Yahoo Finance primeiro
+        try:
+            yf_news = self.ticker.news
+            if yf_news:
+                for n in yf_news:
+                    title = n.get("title") or n.get("headline")
+                    if title:
+                        news.append({
+                            "title": str(title),
+                            "link": n.get("link", "#"),
+                            "publisher": n.get("publisher", "Yahoo Finance")
+                        })
+                    if len(news) >= limit: break
+        except Exception as e:
+            logger.warning(f"Yahoo News falhou: {e}")
+
+        # 2. Se falhar ou vier pouco, vai de Google News RSS (Busca Direta)
+        if len(news) < limit:
+            try:
+                # Limpa o ticker para busca (remove .SA)
+                clean_ticker = self.ticker_symbol.replace(".SA", "")
+                url = f"https://news.google.com/rss/search?q={clean_ticker}+B3+quando:7d&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+                
+                # Requisição direta ignorando SSL
+                response = requests_cffi.get(url, impersonate="chrome", verify=False, timeout=10)
+                
+                if response.status_code == 200:
+                    from bs4 import BeautifulSoup
+                    soup = BeautifulSoup(response.content, features="xml")
+                    items = soup.find_all("item")
+                    
+                    for item in items:
+                        title = item.title.text if item.title else None
+                        if title:
+                            # Evita duplicatas simples
+                            if not any(title[:20] in n["title"] for n in news):
+                                news.append({
+                                    "title": str(title),
+                                    "link": item.link.text if item.link else "#",
+                                    "publisher": item.source.text if item.source else "Google News"
+                                })
+                        if len(news) >= limit: break
+            except Exception as e:
+                logger.error(f"Fallback Google News falhou: {e}")
+
+        return news[:limit]
+
+    def get_history(self, period: str = "1y") -> pd.DataFrame:
+        """
+        Coleta o histórico de preços para o período solicitado.
+        
+        Args:
+            period (str): Período (ex: '1mo', '6mo', '1y', '5y').
+            
+        Returns:
+            pd.DataFrame: DataFrame com os preços históricos.
+        """
+        logger.info(f"Coletando histórico de {period} para {self.ticker_symbol}")
+        return self.ticker.history(period=period)
 
 if __name__ == "__main__":
     # Teste rápido de execução
