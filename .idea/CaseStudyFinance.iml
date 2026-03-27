@@ -8,7 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/venvproj/Lib" />
       <excludeFolder url="file://$MODULE_DIR$/venvproj/Scripts" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.14 (Sandbox)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.14 (CaseStudyFinance)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
