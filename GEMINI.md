@@ -84,29 +84,28 @@ Prefira profundidade à amplitude. Fontes de dados devem ser públicas e gratuit
 
 # Status do Projeto: Hipótese Capital - Terminal Analítico
 
-## 1. Conquistas da Fase 1 (Sprints 1 a 4)
-O projeto automatizou com sucesso a coleta e análise de dados para um analista sênior da Hipótese Capital.
-- **Pipeline de Dados:** Coleta robusta de dados cadastrais, indicadores fundamentalistas e notícias (Bypass de SSL e Rate Limit implementados com `curl_cffi` e `impersonate="chrome"`).
-- **Inteligência Analítica:** Integração com OpenAI (GPT-4o) utilizando prompts especializados em *Value Investing*.
-- **Interface Visual:** Dashboard Streamlit sofisticado com fontes serifadas, suporte a temas (Claro/Escuro), métricas contrastantes e gráficos quantitativos.
-- **Qualidade de Software:** Suite de testes unitários com mocks completos, permitindo desenvolvimento offline.
+## 1. Conquistas da Fase 1 (Refinada e Consolidada)
+O projeto automatizou com sucesso a coleta e análise de dados sob a ótica de *Value Investing*.
+- **Pipeline de Dados:** Coleta ultra-resiliente via Yahoo Finance (com suporte a dicionários aninhados) e fallback para Google News RSS (usando `lxml`).
+- **Arquitetura Clean:** O projeto foi totalmente modularizado. A UI foi separada em um pacote próprio (`ui/`), a lógica de dados reside em `core/` e as configurações foram centralizadas na raiz (`config.py`).
+- **Branding Oficial:** Implementação da identidade visual da Hipótese Capital (Vermelho Deep, Bege e Grafite) com tipografia serifada (*Playfair Display*).
+- **Ambiente de Desenvolvimento:** `requirements.txt` atualizado com todas as dependências necessárias (`lxml`, `curl_cffi`, etc).
 
-## 2. Visão Técnica (Handover para Próxima Sessão)
-### Stack Atual
-- Python 3.x, Streamlit, yfinance, curl_cffi, OpenAI, Pytest.
-- **Resiliência:** O `DataCollector` lida com caminhos de pasta contendo caracteres especiais e rate limits de API.
-- **Prompts:** Estão isolados em `core/prompts.py` para fácil ajuste da tese de investimento.
+## 2. Visão Técnica (Handover)
+### Estrutura Atual
+- `app.py`: Orquestrador minimalista.
+- `config.py`: Single Source of Truth para parâmetros, cores, fontes e prompts.
+- `ui/`: Módulos `styles.py`, `sidebar.py` e `components.py` para gestão de interface.
+- `core/`: `collector.py` (dados) e `analyzer.py` (IA).
 
-### Desafios Identificados
-- **Notícias:** A API do Yahoo Finance é instável para títulos; o fallback via Google News RSS é a solução atual.
-- **Gráficos:** Atualmente focados em preço (12m), mas há demanda por mais dados quantitativos visuais.
+### Desafios de UI Identificados
+- **Especificidade de CSS:** O Streamlit possui seletores internos agressivos que às vezes sobrepõem o CSS customizado, afetando ícones nativos e a consistência das fontes serifadas.
 
 ## 3. Road Map para Fase 2 (Pipeline Robusto e Persistência)
-O próximo passo é dar "memória" ao sistema para que o analista possa comparar o histórico de uma empresa:
-1. **Banco de Dados:** Implementar `core/database.py` usando SQLite.
-2. **Modelagem:** Separar dados estáticos (Perfil) de dados dinâmicos (Cotações e Indicadores por data).
-3. **Persistência:** Modificar o pipeline para que cada rodada salve os dados no banco sem sobrescrever o passado.
-4. **Dashboard Histórico:** Adicionar gráficos que mostrem a evolução do P/L ou ROE da empresa ao longo do tempo (obtendo esses dados do banco).
+O próximo passo é dar "memória" ao sistema para permitir análises históricas:
+1. **Banco de Dados:** Implementar `core/database.py` usando SQLite para persistir consultas.
+2. **Modelagem de Dados:** Separar perfil da empresa (estático) de indicadores/notícias (dinâmicos).
+3. **Histórico no Dashboard:** Evoluir a interface para mostrar comparações temporais de indicadores extraídos do banco.
 
 ---
 *Instrução para IA:* Ao iniciar a Fase 2, foque primeiro na criação da classe `DatabaseManager` e na adaptação do `app.py` para ler dados históricos.
