@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 from curl_cffi import requests as requests_cffi
 from typing import Dict, Optional, Any
+from config import NEWS_LIMIT, DEFAULT_HISTORY_PERIOD
 from utils.logger import logger
 
 class DataCollector:
@@ -15,8 +16,6 @@ class DataCollector:
         self.ticker_symbol = ticker.upper() if ticker.upper().endswith(".SA") else f"{ticker.upper()}.SA"
         
         # Cria uma sessão do curl_cffi mimetizando um navegador Chrome real
-        # impersonate="chrome" ajuda a evitar o erro "Too Many Requests"
-        # verify=False contorna o erro de path com caracteres especiais (curl 77)
         session = requests_cffi.Session(impersonate="chrome", verify=False)
         
         self.ticker = yf.Ticker(self.ticker_symbol, session=session)
@@ -24,9 +23,6 @@ class DataCollector:
     def collect_all_data(self) -> Dict[str, Any]:
         """
         Executa a coleta completa: Cadastral, Mercado e Notícias.
-        
-        Returns:
-            Dict: Dicionário contendo todas as informações coletadas.
         """
         logger.info(f"Iniciando coleta de dados para: {self.ticker_symbol}")
         
@@ -40,7 +36,7 @@ class DataCollector:
             data = {
                 "cadastral": self._get_cadastral_data(info),
                 "market_indicators": self._get_market_indicators(info),
-                "news": self._get_recent_news()
+                "news": self._get_recent_news(limit=NEWS_LIMIT)
             }
             
             logger.info(f"Coleta finalizada com sucesso para {self.ticker_symbol}")
@@ -65,12 +61,12 @@ class DataCollector:
             "preco_atual": info.get("currentPrice"),
             "p_l": info.get("trailingPE"),
             "roe": info.get("returnOnEquity"),
-            "divida_ebitda": info.get("debtToEbitda"), # Nem sempre disponível no yfinance para BR
+            "divida_ebitda": info.get("debtToEbitda"),
             "margem_liquida": info.get("profitMargins"),
             "dy": info.get("dividendYield")
         }
 
-    def _get_recent_news(self, limit: int = 5) -> list:
+    def _get_recent_news(self, limit: int = NEWS_LIMIT) -> list:
         """
         Coleta notícias recentes de forma ultra-resiliente, suportando múltiplos 
         formatos de resposta do Yahoo Finance e fallback para Google News.
@@ -81,32 +77,25 @@ class DataCollector:
             yf_news = self.ticker.news
             if yf_news:
                 for n in yf_news:
-                    # Suporta formato novo (aninhado em content) e formato antigo (direto)
                     content = n.get("content", n)
                     title = content.get("title") or content.get("headline")
                     link = content.get("canonicalUrl", {}).get("url") or n.get("link", "#")
                     publisher = content.get("provider", {}).get("displayName") or n.get("publisher", "Yahoo Finance")
 
                     if title:
-                        news.append({
-                            "title": str(title),
-                            "link": link,
-                            "publisher": publisher
-                        })
+                        news.append({"title": str(title), "link": link, "publisher": publisher})
                     if len(news) >= limit: break
         except Exception as e:
             logger.warning(f"Yahoo News falhou: {e}")
 
-        # 2. Se falhar ou vier pouco, vai de Google News RSS (Busca Direta)
+        # 2. Fallback Google News RSS
         if len(news) < limit:
             try:
                 clean_ticker = self.ticker_symbol.replace(".SA", "")
                 url = f"https://news.google.com/rss/search?q={clean_ticker}+B3&hl=pt-BR&gl=BR&ceid=BR:pt-419"
-                
                 response = requests_cffi.get(url, impersonate="chrome", verify=False, timeout=10)
                 
                 if response.status_code == 200:
-                    # Realiza webscraping no google notícias para obter as notícias do Ticker
                     from bs4 import BeautifulSoup
                     soup = BeautifulSoup(response.content, features="xml")
                     items = soup.find_all("item")
@@ -114,7 +103,6 @@ class DataCollector:
                     for item in items:
                         title = item.title.text if item.title else None
                         if title:
-                            # Evita duplicatas simples (compara os primeiros 30 caracteres)
                             if not any(title[:30] in n["title"] for n in news):
                                 news.append({
                                     "title": str(title),
@@ -127,25 +115,13 @@ class DataCollector:
 
         return news[:limit]
 
-    def get_history(self, period: str = "1y") -> pd.DataFrame:
-        """
-        Coleta o histórico de preços para o período solicitado.
-        
-        Args:
-            period (str): Período (ex: '1mo', '6mo', '1y', '5y').
-            
-        Returns:
-            pd.DataFrame: DataFrame com os preços históricos.
-        """
+    def get_history(self, period: str = DEFAULT_HISTORY_PERIOD) -> pd.DataFrame:
+        """Coleta o histórico de preços."""
         logger.info(f"Coletando histórico de {period} para {self.ticker_symbol}")
         return self.ticker.history(period=period)
 
 if __name__ == "__main__":
-    # Teste rápido de execução
-    ticker_test = "ITUB4" # Testando com Itaú
+    ticker_test = "ITUB4"
     collector = DataCollector(ticker_test)
     result = collector.collect_all_data()
-    
-    import json
-    print("\n--- RESULTADO DA COLETA ---")
-    print(json.dumps(result, indent=4, ensure_ascii=False))
+    print(result)
