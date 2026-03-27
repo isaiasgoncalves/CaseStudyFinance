@@ -8,3 +8,4 @@ pytest
 pytest-mock
 requests
 beautifulsoup4
+lxml
