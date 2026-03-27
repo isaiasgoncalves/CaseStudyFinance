@@ -24,5 +24,12 @@ O próximo passo agora é criar os recursos de IA para interpretação dos dados
 os modelos ChatGPT da OpenAI para fazer a análise, e configuramos um arquivo para deixar os prompts, sabendo que podem ser
 aprimorados para obter uma análise ainda mais precisa e útil considerando o contexto do projeto
 
+Temos agora um dashboard elaborado com o streamlit, capaz de mostrar várias informações úteis sobre o Tiker, coletadas via
+API e sintetizadas com um LLM. 
+
+As etapas finais da Fase 1 consistem em corrigir alguns bugs e tornar o código mais robusto para a fase 2.
+
+
+
 
 
