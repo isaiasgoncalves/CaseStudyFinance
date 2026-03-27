@@ -1,21 +1,19 @@
 import logging
 import sys
+import os
 from pathlib import Path
 
 def setup_logger(name: str = "case_finance") -> logging.Logger:
     """
     Configura um logger centralizado para o projeto com saída para console e arquivo.
-    
-    Args:
-        name (str): Nome do logger.
-        
-    Returns:
-        logging.Logger: Instância configurada do logger.
     """
     logger = logging.getLogger(name)
     
+    # Nível do logger vindo do ENV ou padrão INFO
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+    
     if not logger.handlers:
-        logger.setLevel(logging.INFO)
+        logger.setLevel(getattr(logging, log_level))
         
         # Formato da mensagem
         formatter = logging.Formatter(
