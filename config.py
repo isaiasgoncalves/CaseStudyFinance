@@ -16,30 +16,16 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 AVAILABLE_MODELS = ["gpt-4o-mini", "gpt-4o"]
 
-# --- CONFIGURAÇÕES DE UI & DESIGN (BRANDING OFICIAL) ---
-BRAND_PALETTE = {
-    "primary_red": "#660B05",
-    "light": "#FFF0C4",
-    "light_red": "#8C1007",
-    "dark_red": "#3E0703",
-    "light_silver": "#979797",
-    "dark_silver": "#141413",
-}
+# --- ASSETS DE BRANDING ---
+# Mantemos os caminhos para serem usados no código
+LOGO_LIGHT = "branding/Logo Claro.png"
+LOGO_DARK = "branding/Logo escuro.png"
+ICON_BRAND = "branding/Icone_com_fundo.png"
 
-# Assets de Branding
-LOGO_LIGHT = "Branding/Logo Claro.png"
-LOGO_DARK = "Branding/Logo escuro.png"
-ICON_BRAND = "Branding/Icone_com_fundo.png"
-
-# Cores Principais do Tema (TEMA ESCURO ATIVADO)
-UI_PRIMARY_COLOR = BRAND_PALETTE["primary_red"]
-UI_BG_COLOR = BRAND_PALETTE["dark_silver"]  # Cinza escuro da paleta
-UI_TEXT_COLOR = BRAND_PALETTE["light"]      # Bege suave para texto
-UI_SECONDARY_RED = BRAND_PALETTE["light_red"]
-
-# Fontes
-UI_FONT_SERIF = "'Playfair Display', serif"
-UI_FONT_SANS = "'Source Sans Pro', sans-serif"
+# --- CORES PARA GRÁFICOS E ALERTAS ---
+# Usamos essas constantes apenas onde o Streamlit não aplica o tema automaticamente (ex: cores de linhas de gráficos)
+CHART_COLOR_PRIMARY = "#660B05" # Vermelho Hipótese
+CHART_COLOR_SECONDARY = "#8C1007" 
 
 # --- PROMPTS DO SISTEMA (CONSOLIDADO) ---
 SYSTEM_PERSONA = "Você é um Analista de Investimentos Sênior na Hipótese Capital, uma gestora focada em Value Investing."
@@ -72,9 +58,4 @@ Gere um JSON com as seguintes chaves:
 4. "perguntas_investigativas": Três perguntas cruciais que desafiem a tese de investimento, voltadas para o RI da empresa.
 
 O tom deve ser técnico, direto e focado em preservação de capital.
-"""
-
-# Placeholder para prompts futuros (Fase 3)
-RAG_ANALYSIS_PROMPT = """
-...
 """

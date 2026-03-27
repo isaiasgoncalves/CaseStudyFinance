@@ -1,17 +1,14 @@
 import streamlit as st
 import pandas as pd
-from config import UI_PRIMARY_COLOR, UI_TEXT_COLOR
+from config import CHART_COLOR_PRIMARY
 
 def render_header(ticker_symbol: str, nome_empresa: str):
-    """Exibe o cabeçalho de identificação da empresa."""
-    st.markdown(
-        f"<h1>{nome_empresa} <span style='font-size: 1.2rem; color: {UI_TEXT_COLOR}; opacity: 0.6;'>({ticker_symbol})</span></h1>", 
-        unsafe_allow_html=True
-    )
+    """Exibe o cabeçalho de identificação da empresa usando componentes nativos."""
+    st.title(f"{nome_empresa} :grey[({ticker_symbol})]")
 
 def render_summary_cards(data: dict):
-    """Renderiza os indicadores fundamentalistas em cards."""
-    st.markdown("<div class='section-header'>Indicadores Fundamentalistas</div>", unsafe_allow_html=True)
+    """Renderiza os indicadores fundamentalistas em cards usando o sistema de colunas nativo."""
+    st.header("📊 Indicadores Fundamentalistas")
     indicators = data.get("market_indicators", {})
     
     col1, col2, col3, col4, col5 = st.columns(5)
@@ -20,67 +17,72 @@ def render_summary_cards(data: dict):
     def fmt_curr(val): return f"R$ {val:.2f}" if val else "N/A"
     def fmt_num(val): return f"{val:.2f}" if val else "N/A"
 
-    col1.metric("Cotação Atual", fmt_curr(indicators.get('preco_atual')))
-    col2.metric("P/L", fmt_num(indicators.get('p_l')))
-    col3.metric("ROE", fmt_pct(indicators.get('roe')))
-    col4.metric("Margem Líquida", fmt_pct(indicators.get('margem_liquida')))
-    col5.metric("Div. Yield", fmt_pct(indicators.get('dy')))
+    with col1:
+        st.metric("Cotação Atual", fmt_curr(indicators.get('preco_atual')))
+    with col2:
+        st.metric("P/L", fmt_num(indicators.get('p_l')))
+    with col3:
+        st.metric("ROE", fmt_pct(indicators.get('roe')))
+    with col4:
+        st.metric("Margem Líquida", fmt_pct(indicators.get('margem_liquida')))
+    with col5:
+        st.metric("Div. Yield", fmt_pct(indicators.get('dy')))
 
 def render_price_chart(collector):
-    """Gera o gráfico de performance histórica."""
-    st.markdown("<div class='section-header'>Performance Histórica (12m)</div>", unsafe_allow_html=True)
+    """Gera o gráfico de performance histórica com a cor da marca."""
+    st.subheader("📈 Performance do Ativo (12 Meses)")
     history = collector.get_history(period="1y")
     if not history.empty:
-        # Usando a cor primária da marca (Vermelho Hipótese) para a linha
-        st.line_chart(history['Close'], width='stretch', color=UI_PRIMARY_COLOR)
+        st.line_chart(history['Close'], color=CHART_COLOR_PRIMARY)
+    else:
+        st.warning("Dados históricos de preço não disponíveis.")
 
 def render_recent_news_list(news_data: list):
-    """Renderiza a lista de notícias coletadas com links."""
-    st.markdown("<div class='section-header'>Notícias Mais Relevantes</div>", unsafe_allow_html=True)
+    """Renderiza a lista de notícias coletadas de forma limpa e organizada."""
+    st.header("📰 Notícias Mais Relevantes")
     if not news_data:
-        st.write("Nenhuma notícia recente encontrada.")
+        st.info("Nenhuma notícia recente encontrada para este ativo.")
         return
 
     for n in news_data[:5]:
-        with st.container():
-            col_icon, col_content = st.columns([0.05, 0.95])
-            col_icon.write("📰")
-            title = n.get('title', 'Sem título')
-            link = n.get('link', '#')
-            publisher = n.get('publisher', 'Fonte desconhecida')
-            col_content.markdown(f"**[{title}]({link})**  \n*Fonte: {publisher}*")
-            st.write("")
+        with st.expander(f"**{n.get('title', 'Sem título')}**", expanded=False):
+            st.write(f"*Fonte: {n.get('publisher', 'Fonte desconhecida')}*")
+            st.link_button("Ler Notícia Completa", n.get('link', '#'))
 
-def _get_sentiment_class(sentiment_text: str) -> str:
-    """Determina a classe CSS com base no texto de sentimento."""
+def _get_sentiment_info(sentiment_text: str):
+    """Retorna o tipo de alerta e ícone baseado no sentimento."""
     text = sentiment_text.lower()
-    if "positivo" in text: return "sentiment-positivo"
-    if "negativo" in text: return "sentiment-negativo"
-    return "sentiment-neutro"
+    if "positivo" in text or "positiva" in text:
+        return "success", "🚀"
+    if "negativo" in text or "negativa" in text:
+        return "error", "⚠️"
+    return "info", "🔍"
 
 def render_ai_analysis(analysis: dict):
     """Exibe a síntese gerada pelo LLM sob a ótica de Value Investing."""
-    st.markdown("<div class='section-header'>Síntese do Comitê de Análise</div>", unsafe_allow_html=True)
+    st.header("🏛️ Síntese do Comitê de Análise")
     
-    st.subheader("Resumo do Negócio")
-    st.write(analysis.get("resumo_negocio", "N/A"))
+    tab1, tab2, tab3 = st.tabs(["Resumo e Tese", "Análise de Risco", "Checklist Investigativo"])
     
-    st.divider()
-
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.subheader("Análise de Valor & Downside")
-        st.write(analysis.get("analise_indicadores", "N/A"))
+    with tab1:
+        st.subheader("📌 Resumo do Modelo de Negócio")
+        st.write(analysis.get("resumo_negocio", "N/A"))
         
         sentiment_text = analysis.get("sentimento_noticias", "Neutro")
-        sentiment_class = _get_sentiment_class(sentiment_text)
-        st.markdown(
-            f"<div class='{sentiment_class}'><strong>Clima das Notícias:</strong><br>{sentiment_text}</div>", 
-            unsafe_allow_html=True
-        )
+        stype, icon = _get_sentiment_info(sentiment_text)
+        
+        if stype == "success":
+            st.success(f"**Clima das Notícias:** {sentiment_text}", icon=icon)
+        elif stype == "error":
+            st.error(f"**Clima das Notícias:** {sentiment_text}", icon=icon)
+        else:
+            st.info(f"**Clima das Notícias:** {sentiment_text}", icon=icon)
 
-    with col2:
-        st.subheader("Questões Investigativas (Checklist RI)")
+    with tab2:
+        st.subheader("⚖️ Análise de Valor & Downside")
+        st.markdown(f"> {analysis.get('analise_indicadores', 'N/A')}")
+
+    with tab3:
+        st.subheader("❓ Perguntas para o RI (Relação com Investidores)")
         for i, q in enumerate(analysis.get("perguntas_investigativas", []), 1):
-            st.markdown(f"**{i}.** {q}")
+            st.info(f"**{i}.** {q}")
