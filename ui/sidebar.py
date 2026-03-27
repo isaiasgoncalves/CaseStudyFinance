@@ -1,13 +1,14 @@
 import streamlit as st
-
-from config import DEFAULT_TICKER, AVAILABLE_MODELS, VERSION
+from config import LOGO_LIGHT, DEFAULT_TICKER, AVAILABLE_MODELS, VERSION
 
 def render_sidebar():
     """
-    Renderiza a barra lateral usando configurações de config.py.
+    Renderiza a barra lateral com o logo oficial da Hipótese Capital (Versão Clara).
     """
     with st.sidebar:
-        st.markdown("<h2 style='text-align: center;'>🏛️ Hipótese Capital</h2>", unsafe_allow_html=True)
+        # Logo único na sidebar (usando a versão CLARA para fundo ESCURO)
+        st.image(LOGO_LIGHT, width='stretch')
+        
         st.divider()
         
         ticker = st.text_input(
@@ -24,7 +25,9 @@ def render_sidebar():
         
         analyze_button = st.button("Executar Análise de Valor", use_container_width=True)
         
-        st.v_spacer(height=20)
+        st.markdown("<div style='height: 40px;'></div>", unsafe_allow_html=True)
+        
+        st.caption(f"Hipótese Capital Asset Management")
         st.caption(f"Terminal Analítico | {VERSION}")
         
         return ticker, model_name, analyze_button

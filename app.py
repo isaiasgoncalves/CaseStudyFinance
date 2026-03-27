@@ -3,7 +3,7 @@ from core.collector import DataCollector
 from core.analyzer import InvestmentAnalyzer
 from utils.logger import logger
 
-# Importações dos novos módulos de UI
+# Importações dos módulos de UI
 from ui.styles import apply_custom_styles
 from ui.sidebar import render_sidebar
 from ui.components import (
@@ -63,15 +63,14 @@ def main():
     if run_analysis:
         run_analytical_pipeline(ticker_symbol, model_name)
     else:
-        # Estado de Boas-vindas (Initial State)
-        st.title(f"🏛️ {PROJECT_NAME}")
+        # Estado de Boas-vindas (Initial State) - Sem Logo (centralizado na sidebar)
+        st.markdown(f"<h1>{PROJECT_NAME}</h1>", unsafe_allow_html=True)
         st.write("Selecione um ativo na barra lateral para iniciar a devida diligência sob a ótica de Value Investing.")
         
-        # Opcional: Card informativo de boas-vindas
         st.info("""
-            **Bem-vindo ao Terminal Analítico.** 
+            **Bem-vindo ao Terminal Hipótese Capital.** 
             Este sistema automatiza a coleta de indicadores fundamentalistas, 
-            notícias de mercado e gera uma síntese qualitativa focada em proteção de downside.
+            notícias de mercado e gera uma síntese qualitativa focada em proteção de downside e valor intrínseco.
         """)
 
 if __name__ == "__main__":

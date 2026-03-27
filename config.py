@@ -16,7 +16,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 AVAILABLE_MODELS = ["gpt-4o-mini", "gpt-4o"]
 
-# --- CONFIGURAÇÕES DE UI & DESIGN ---
+# --- CONFIGURAÇÕES DE UI & DESIGN (BRANDING OFICIAL) ---
 BRAND_PALETTE = {
     "primary_red": "#660B05",
     "light": "#FFF0C4",
@@ -25,8 +25,19 @@ BRAND_PALETTE = {
     "light_silver": "#979797",
     "dark_silver": "#141413",
 }
-UI_PRIMARY_COLOR = "#1e3a8a"  # Azul Marinho Hipótese
-UI_SECONDARY_COLOR = "#1e40af"
+
+# Assets de Branding
+LOGO_LIGHT = "Branding/Logo Claro.png"
+LOGO_DARK = "Branding/Logo escuro.png"
+ICON_BRAND = "Branding/Icone_com_fundo.png"
+
+# Cores Principais do Tema (TEMA ESCURO ATIVADO)
+UI_PRIMARY_COLOR = BRAND_PALETTE["primary_red"]
+UI_BG_COLOR = BRAND_PALETTE["dark_silver"]  # Cinza escuro da paleta
+UI_TEXT_COLOR = BRAND_PALETTE["light"]      # Bege suave para texto
+UI_SECONDARY_RED = BRAND_PALETTE["light_red"]
+
+# Fontes
 UI_FONT_SERIF = "'Playfair Display', serif"
 UI_FONT_SANS = "'Source Sans Pro', sans-serif"
 

@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
+from config import UI_PRIMARY_COLOR, UI_TEXT_COLOR
 
 def render_header(ticker_symbol: str, nome_empresa: str):
     """Exibe o cabeçalho de identificação da empresa."""
     st.markdown(
-        f"# {nome_empresa} <span style='font-size: 1.2rem; color: #666;'>({ticker_symbol})</span>", 
+        f"<h1>{nome_empresa} <span style='font-size: 1.2rem; color: {UI_TEXT_COLOR}; opacity: 0.6;'>({ticker_symbol})</span></h1>", 
         unsafe_allow_html=True
     )
 
@@ -30,7 +31,8 @@ def render_price_chart(collector):
     st.markdown("<div class='section-header'>Performance Histórica (12m)</div>", unsafe_allow_html=True)
     history = collector.get_history(period="1y")
     if not history.empty:
-        st.line_chart(history['Close'], width='stretch', color="#1e3a8a")
+        # Usando a cor primária da marca (Vermelho Hipótese) para a linha
+        st.line_chart(history['Close'], width='stretch', color=UI_PRIMARY_COLOR)
 
 def render_recent_news_list(news_data: list):
     """Renderiza a lista de notícias coletadas com links."""
