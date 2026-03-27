@@ -1,6 +1,6 @@
 import streamlit as st
 
-from core.config import UI_FONT_SERIF, UI_FONT_SANS, UI_PRIMARY_COLOR
+from config import UI_FONT_SERIF, UI_FONT_SANS, UI_PRIMARY_COLOR
 
 def apply_custom_styles():
     """

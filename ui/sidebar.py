@@ -1,6 +1,6 @@
 import streamlit as st
 
-from core.config import DEFAULT_TICKER, AVAILABLE_MODELS, VERSION
+from config import DEFAULT_TICKER, AVAILABLE_MODELS, VERSION
 
 def render_sidebar():
     """
