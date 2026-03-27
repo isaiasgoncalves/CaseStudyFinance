@@ -72,7 +72,8 @@ class DataCollector:
 
     def _get_recent_news(self, limit: int = 5) -> list:
         """
-        Coleta notícias recentes de forma ultra-resiliente.
+        Coleta notícias recentes de forma ultra-resiliente, suportando múltiplos 
+        formatos de resposta do Yahoo Finance e fallback para Google News.
         """
         news = []
         # 1. Tenta Yahoo Finance primeiro
@@ -80,12 +81,17 @@ class DataCollector:
             yf_news = self.ticker.news
             if yf_news:
                 for n in yf_news:
-                    title = n.get("title") or n.get("headline")
+                    # Suporta formato novo (aninhado em content) e formato antigo (direto)
+                    content = n.get("content", n)
+                    title = content.get("title") or content.get("headline")
+                    link = content.get("canonicalUrl", {}).get("url") or n.get("link", "#")
+                    publisher = content.get("provider", {}).get("displayName") or n.get("publisher", "Yahoo Finance")
+
                     if title:
                         news.append({
                             "title": str(title),
-                            "link": n.get("link", "#"),
-                            "publisher": n.get("publisher", "Yahoo Finance")
+                            "link": link,
+                            "publisher": publisher
                         })
                     if len(news) >= limit: break
         except Exception as e:
@@ -94,14 +100,13 @@ class DataCollector:
         # 2. Se falhar ou vier pouco, vai de Google News RSS (Busca Direta)
         if len(news) < limit:
             try:
-                # Limpa o ticker para busca (remove .SA)
                 clean_ticker = self.ticker_symbol.replace(".SA", "")
-                url = f"https://news.google.com/rss/search?q={clean_ticker}+B3+quando:7d&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+                url = f"https://news.google.com/rss/search?q={clean_ticker}+B3&hl=pt-BR&gl=BR&ceid=BR:pt-419"
                 
-                # Requisição direta ignorando SSL
                 response = requests_cffi.get(url, impersonate="chrome", verify=False, timeout=10)
                 
                 if response.status_code == 200:
+                    # Realiza webscraping no google notícias para obter as notícias do Ticker
                     from bs4 import BeautifulSoup
                     soup = BeautifulSoup(response.content, features="xml")
                     items = soup.find_all("item")
@@ -109,8 +114,8 @@ class DataCollector:
                     for item in items:
                         title = item.title.text if item.title else None
                         if title:
-                            # Evita duplicatas simples
-                            if not any(title[:20] in n["title"] for n in news):
+                            # Evita duplicatas simples (compara os primeiros 30 caracteres)
+                            if not any(title[:30] in n["title"] for n in news):
                                 news.append({
                                     "title": str(title),
                                     "link": item.link.text if item.link else "#",
