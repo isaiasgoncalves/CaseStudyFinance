@@ -36,7 +36,7 @@ def render_sidebar():
         st.markdown("<br>" * 5, unsafe_allow_html=True)
         
         st.caption("---")
-        st.caption(f"**Hipótese Capital Asset Management**")
-        st.caption(f"Terminal Analítico | {VERSION}")
+        st.caption(f"**Hipótese Capital** *Asset Management*")
+        st.caption(f"por *Isaías G. Gonçalves* | Versão {VERSION}")
         
         return ticker, model_name, analyze_button
