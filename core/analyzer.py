@@ -6,25 +6,45 @@ from utils.logger import logger
 
 class InvestmentAnalyzer:
     """
-    Classe responsável por realizar a síntese de dados fundamentalistas 
-    e notícias sob a ótica de Value Investing usando OpenAI.
+    Analista de Investimentos via LLM.
+    
+    Consome dados fundamentalistas e notícias para gerar uma síntese 
+    qualitativa baseada na filosofia de Value Investing.
+    
+    Attributes:
+        client (OpenAI): Cliente da API OpenAI inicializado.
+        model (str): Identificador do modelo GPT em uso.
     """
     
-    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None) -> None:
+        """
+        Inicializa o analyzer com credenciais e modelo.
+        
+        Args:
+            api_key: Chave OpenAI (fallback para config.py).
+            model: Nome do modelo (fallback para config.py).
+        """
         self.api_key = api_key or OPENAI_API_KEY
         self.model = model or DEFAULT_MODEL
         
         if not self.api_key:
-            logger.error("API Key da OpenAI não encontrada em core/config.py ou no .env.")
-            raise ValueError("OpenAI API Key é necessária.")
+            logger.error("Chave da OpenAI ausente nas configurações.")
+            raise ValueError("OpenAI API Key é obrigatória.")
             
         self.client = OpenAI(api_key=self.api_key)
 
     def analyze_ticker(self, ticker: str, data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Envia os dados coletados para o LLM e gera a análise qualitativa.
+        Orquestra a chamada ao LLM para análise qualitativa de um ticker.
+        
+        Args:
+            ticker: Símbolo do ativo.
+            data: Dicionário de dados coletados pelo DataCollector.
+            
+        Returns:
+            Dict[str, Any]: JSON estruturado com a análise ou erro.
         """
-        logger.info(f"Iniciando análise qualitativa via LLM para: {ticker}")
+        logger.info(f"Iniciando síntese qualitativa (LLM): {ticker}")
         
         prompt = self._build_prompt(ticker, data)
         
@@ -38,17 +58,22 @@ class InvestmentAnalyzer:
                 response_format={"type": "json_object"}
             )
             
-            analysis = json.loads(response.choices[0].message.content)
-            logger.info(f"Análise finalizada com sucesso para {ticker}")
+            content = response.choices[0].message.content
+            if not content:
+                raise ValueError("Resposta da OpenAI veio vazia.")
+                
+            analysis = json.loads(content)
+            logger.info(f"Análise LLM concluída para {ticker}")
             return analysis
             
         except Exception as e:
-            logger.error(f"Erro na chamada da API OpenAI para {ticker}: {str(e)}")
-            return {"error": f"Não foi possível gerar a análise: {str(e)}"}
+            logger.error(f"Erro na integração com OpenAI ({ticker}): {str(e)}")
+            return {"error": f"Não foi possível processar a análise: {str(e)}"}
 
     def _build_prompt(self, ticker: str, data: Dict[str, Any]) -> str:
-        """Constrói o prompt estruturado usando o template de config.py."""
-        
+        """
+        Injeta os dados coletados no template de prompt do analista.
+        """
         cadastral = data.get("cadastral", {})
         indicators = data.get("market_indicators", {})
         news = data.get("news", [])
@@ -66,12 +91,5 @@ class InvestmentAnalyzer:
             divida_ebitda=indicators.get('divida_ebitda', 'N/A'),
             margem_liquida=indicators.get('margem_liquida', 'N/A'),
             dy=indicators.get('dy', 'N/A'),
-            noticias=news_titles if news_titles else "Nenhuma notícia relevante encontrada."
+            noticias=news_titles if news_titles else "Nenhuma notícia relevante nos últimos 90 dias."
         )
-
-
-if __name__ == "__main__":
-    # Teste rápido de execução (necessário chave real no .env)
-    # analyzer = InvestmentAnalyzer()
-    # print(analyzer.analyze_ticker("TESTE", {"cadastral": {"nome": "Exemplo SA"}, "market_indicators": {"p_l": 10}}))
-    pass

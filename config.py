@@ -6,7 +6,7 @@ load_dotenv()
 
 # --- CONFIGURAÇÕES GERAIS DO PROJETO ---
 PROJECT_NAME = "Hipótese Capital | Terminal Analítico"
-VERSION = "1.0.1"
+VERSION = "1.1.0 (Fase 1 Finalizada)"
 DEFAULT_TICKER = "ASAI3"
 DEFAULT_HISTORY_PERIOD = "1y"
 NEWS_LIMIT = 5

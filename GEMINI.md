@@ -30,14 +30,12 @@ Prefira profundidade à amplitude. Fontes de dados devem ser públicas e gratuit
 * **1.1 Coleta Automatizada:** Dado um ticker, coletar:
     * *Dados cadastrais:* Nome, setor, segmento de atuação (classificação B3) e descrição do modelo de negócio. (Fontes sugeridas: CVM, B3, Status Invest).
     * *Dados de mercado:* Cotação atual, indicadores fundamentalistas (P/L, ROE, Dívida Líquida/EBITDA, Margem Líquida, Dividend Yield) e até 5 notícias mais relevantes.
-    * *Tickers de teste:* ASAI3, RECV3, MOVI3, BRKM5, HBSA3, ITUB4, BBDC4, OPCT3, BRSR6, PRIO3.
 * **1.2 Síntese com LLM:** Enviar os dados coletados via API para um LLM e gerar:
     * Resumo do negócio em 2-3 frases.
-    * Interpretação qualitativa dos indicadores fundamentalistas (o que sugerem, sob a ótica de value investing e proteção de downside).
-    * Síntese das notícias classificadas como positivas, negativas ou neutras.
+    * Interpretação qualitativa dos indicadores fundamentalistas.
+    * Síntese das notícias com classificação estruturada de sentimento.
     * Três perguntas investigativas cruciais para o analista.
-* **1.3 Interface:** Criar uma interface mínima (Streamlit, etc.) onde o usuário digita o ticker e recebe o relatório.
-* *Diferencial:* Tratar tickers inválidos, APIs fora do ar e respostas inesperadas do LLM. O prompt do LLM deve focar em qualidade de negócio.
+* **1.3 Interface:** Interface Streamlit organizada, seguindo o branding da Hipótese Capital.
 
 ### FASE 2: A Demanda Que Ninguém Fez (Obrigatória)
 **Objetivo:** Transformar o protótipo da Fase 1 em um pipeline robusto, confiável e recorrente para qualquer ticker da B3.
@@ -45,67 +43,47 @@ Prefira profundidade à amplitude. Fontes de dados devem ser públicas e gratuit
 * **2.1 Pipeline Estruturado e Banco de Dados:**
     * Salvar dados coletados e gerados em um banco (ex: SQLite).
     * Modelar o banco separando a natureza dos dados: características estáticas/permanentes (perfil da empresa) de dados dinâmicos/variáveis (cotações, indicadores do dia).
-    * Garantir que rodadas subsequentes não sobrescrevam dados anteriores, permitindo consulta histórica no dashboard.
-* **2.2 Tratamento de Erros Exigido:** Implementar tratamentos para:
-    * API fora do ar.
-    * Ticker inválido ou deslistado.
-    * LLM retornando resposta fora do formato esperado.
-* **2.3 Documentação (README):**
-    * Instruções claras permitindo que outro dev rode o pipeline em 10 minutos.
-    * Deve conter: dependências, variáveis de ambiente, instruções de execução e estrutura de pastas.
+* **2.2 Tratamento de Erros Exigido.**
+* **2.3 Documentação (README).**
 
 ### FASE 3: A Conversa no Elevador (Opcional, porém desejável)
-**Objetivo:** Criar um protótipo e um documento conceitual sobre como ensinar uma IA a pensar com o método de investimento da gestora.
-
-* **3.1 Documento Conceitual (1-3 páginas):**
-    * Como ensinar a IA a incorporar o método?
-    * Quais dados históricos são necessários?
-    * Qual arquitetura técnica proposta?
-    * Quais são as limitações e riscos que o sócio precisa conhecer? (Honestidade intelectual aqui vale mais que soluções perfeitas).
-* **3.2 Protótipo de RAG (Retrieval-Augmented Generation):**
-    * Criar 3 a 5 documentos fictícios simulando memorandos da gestora.
-    * Indexá-os com embeddings (ex: FAISS, ChromaDB, Pinecone).
-    * Demonstrar a busca contextual (ex: "o que a equipe pensou sobre empresas do setor elétrico?").
+...
 
 ---
 
-## 4. Dinâmica de Interação (Como você deve me ajudar)
-* Aguarde minhas instruções antes de gerar códigos completos. Pedirei componentes modulares um a um.
-* Sempre que gerar código, inclua os imports necessários, tipagem (type hints) e trate as chaves de API com
-
-# Instruções técnicas para cada uma das fases
-
-(Essa parte poderá ser editada ao longo do processo de produção do código)
-
-## Estratégia de Desenvolvimento e Testes
-* **Testes Unitários:** Utilizaremos `pytest` com `unittest.mock` para isolar chamadas de API externas (Yahoo Finance, LLMs).
-* **Logging:** Centralizado em `utils/logger.py` para rastreabilidade de erros e monitoramento do pipeline.
-* **Commits:** Progressivos e granulares por funcionalidade/módulo.
-
 # Status do Projeto: Hipótese Capital - Terminal Analítico
 
-## 1. Conquistas da Fase 1 (Refinada e Consolidada)
+## 1. Conquistas da Fase 1 (Finalizada e Refinada)
 O projeto automatizou com sucesso a coleta e análise de dados sob a ótica de *Value Investing*.
-- **Pipeline de Dados:** Coleta ultra-resiliente via Yahoo Finance (com suporte a dicionários aninhados) e fallback para Google News RSS (usando `lxml`).
-- **Arquitetura Clean:** O projeto foi totalmente modularizado. A UI foi separada em um pacote próprio (`ui/`), a lógica de dados reside em `core/` e as configurações foram centralizadas na raiz (`config.py`).
-- **Branding Oficial:** Implementação da identidade visual da Hipótese Capital (Vermelho Deep, Bege e Grafite) com tipografia serifada (*Playfair Display*).
-- **Ambiente de Desenvolvimento:** `requirements.txt` atualizado com todas as dependências necessárias (`lxml`, `curl_cffi`, etc).
+- **Pipeline de Dados Robustecido:** 
+    - Coleta via Yahoo Finance e fallback para Google News.
+    - **Filtragem Cronológica:** Implementação de filtro de data para notícias (padrão: 90 dias), garantindo relevância temporal.
+    - **Resiliência:** Tratamento de múltiplos formatos de data (ISO e RFC 822) via `python-dateutil`.
+- **Inteligência Analítica (LLM):** 
+    - Prompts otimizados para retornar JSON estruturado.
+    - **Análise de Sentimento de Notícias:** Agora retorna um objeto com `classe` ("Positivo", "Negativo", "Neutro") e `analise` detalhada, aumentando a precisão da avaliação.
+- **Interface Visual de Alta Fidelidade:** 
+    - **Branding Consolidado:** Uso de `.streamlit/config.toml` para tema nativo estável.
+    - **Tipografia Híbrida:** *Playfair Display* (Serif) para autoridade e *Source Sans Pro* (Sans) para legibilidade.
+    - **UX Melhorada:** Organização por abas (`st.tabs`), uso de `st.status` para feedback de carregamento e integração de notícias com sentimento na mesma coluna.
+- **Arquitetura Clean:** 
+    - Separação clara entre `config.py` (lógica/negócio) e `config.toml` (visual).
+    - Modularização completa em `ui/` e `core/`.
 
-## 2. Visão Técnica (Handover)
-### Estrutura Atual
-- `app.py`: Orquestrador minimalista.
-- `config.py`: Single Source of Truth para parâmetros, cores, fontes e prompts.
-- `ui/`: Módulos `styles.py`, `sidebar.py` e `components.py` para gestão de interface.
-- `core/`: `collector.py` (dados) e `analyzer.py` (IA).
+## 2. Visão Técnica (Handover para Fase 2)
+### Stack Atual
+- Python 3.13+, Streamlit, yfinance, OpenAI, curl_cffi, python-dateutil, BeautifulSoup4.
+- **Configurações:** Centralizadas e protegidas via `.env`.
 
-### Desafios de UI Identificados
-- **Especificidade de CSS:** O Streamlit possui seletores internos agressivos que às vezes sobrepõem o CSS customizado, afetando ícones nativos e a consistência das fontes serifadas.
+### Observações de Qualidade
+- O sistema lida com depreciações do Streamlit (uso de `width='stretch'` em vez de `use_container_width`).
+- Tratamento de exceções rigoroso no coletor e no analyzer.
 
 ## 3. Road Map para Fase 2 (Pipeline Robusto e Persistência)
 O próximo passo é dar "memória" ao sistema para permitir análises históricas:
-1. **Banco de Dados:** Implementar `core/database.py` usando SQLite para persistir consultas.
-2. **Modelagem de Dados:** Separar perfil da empresa (estático) de indicadores/notícias (dinâmicos).
-3. **Histórico no Dashboard:** Evoluir a interface para mostrar comparações temporais de indicadores extraídos do banco.
+1. **Persistência:** Implementar `core/database.py` (SQLite) para salvar rodadas de análise.
+2. **Histórico:** Adicionar visualizações de evolução de indicadores no dashboard.
+3. **Robustez:** Garantir que novas coletas não dupliquem dados estáticos desnecessariamente.
 
 ---
 *Instrução para IA:* Ao iniciar a Fase 2, foque primeiro na criação da classe `DatabaseManager` e na adaptação do `app.py` para ler dados históricos.

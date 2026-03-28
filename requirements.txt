@@ -11,3 +11,4 @@ beautifulsoup4
 lxml
 python-dateutil
 curl_cffi
+typing-extensions
