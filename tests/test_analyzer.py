@@ -3,6 +3,7 @@ import json
 from typing import Any
 from core.analyzer import InvestmentAnalyzer
 
+
 # Simulação de resposta JSON que o LLM enviaria
 MOCK_LLM_RESPONSE = {
     "resumo_negocio": "O Itaú Unibanco é o maior banco privado do Brasil, com forte atuação em varejo e atacado.",

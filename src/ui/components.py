@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from config import CHART_COLOR_PRIMARY, INDICATOR_TOOLTIPS
 
+
 def render_header(ticker_symbol: str, nome_empresa: str):
     """Exibe o cabeçalho de identificação da empresa."""
     st.title(f"{nome_empresa} :grey[({ticker_symbol})]")

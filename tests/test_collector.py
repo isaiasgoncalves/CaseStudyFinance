@@ -18,8 +18,22 @@ MOCK_ITUB_INFO = {
 }
 
 MOCK_ITUB_NEWS = [
-    {"title": "Itaú anuncia dividendos", "link": "http://itau.com/news1", "publisher": "InfoMoney"},
-    {"title": "Análise do setor bancário", "link": "http://itau.com/news2", "publisher": "Valor"}
+    {
+        "content": {
+            "title": "Itaú anuncia dividendos",
+            "pubDate": "2026-03-20T10:00:00Z",
+            "canonicalUrl": {"url": "http://itau.com/news1"},
+            "provider": {"displayName": "InfoMoney"}
+        }
+    },
+    {
+        "content": {
+            "title": "Análise do setor bancário",
+            "pubDate": "2026-03-21T10:00:00Z",
+            "canonicalUrl": {"url": "http://itau.com/news2"},
+            "provider": {"displayName": "Valor"}
+        }
+    }
 ]
 
 @pytest.fixture
@@ -27,16 +41,21 @@ def mock_ticker(mocker: Any) -> Any:
     """Fixture que intercepta a criação do yfinance.Ticker e retorna um mock."""
     return mocker.patch("yfinance.Ticker")
 
-def test_collect_all_data_success(mock_ticker: Any) -> None:
+@pytest.fixture
+def mock_session(mocker: Any) -> Any:
+    """Fixture que intercepta o curl_cffi.requests para evitar chamadas de rede reais (Google News)."""
+    return mocker.patch("src.core.collector.requests_cffi.Session")
+
+def test_collect_all_data_success(mock_ticker: Any, mock_session: Any) -> None:
     """
     Testa o fluxo de sucesso da coleta de dados.
     """
-    # Configuramos o comportamento do mock ANTES de criar o coletor
+    # Configuramos o comportamento do mock do Ticker
     instance = mock_ticker.return_value
     instance.info = MOCK_ITUB_INFO
     instance.news = MOCK_ITUB_NEWS
-    
-    # Agora criamos o coletor; ele usará o mock automaticamente
+
+    # Criamos o coletor
     collector = DataCollector("ITUB4")
     data = collector.collect_all_data()
     
@@ -44,9 +63,11 @@ def test_collect_all_data_success(mock_ticker: Any) -> None:
     assert data["cadastral"]["nome"] == "Itaú Unibanco Holding S.A."
     assert data["market_indicators"]["preco_atual"] == 32.50
     assert data["market_indicators"]["p_l"] == 8.5
+    # O Yahoo agora deve retornar 2 notícias e o Google não deve ser chamado
     assert len(data["news"]) == 2
+    assert data["news"][0]["title"] == "Itaú anuncia dividendos"
 
-def test_collect_all_data_partial_info(mock_ticker: Any) -> None:
+def test_collect_all_data_partial_info(mock_ticker: Any, mock_session: Any) -> None:
     """
     Testa a resiliência do coletor quando a API retorna dados parciais.
     """
@@ -58,6 +79,10 @@ def test_collect_all_data_partial_info(mock_ticker: Any) -> None:
     }
     instance.news = []
     
+    # Mock para o Google News retornar vazio também para evitar rede real
+    session_instance = mock_session.return_value
+    session_instance.get.return_value.status_code = 404 
+
     collector = DataCollector("ITUB4")
     data = collector.collect_all_data()
     

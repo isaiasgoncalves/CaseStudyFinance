@@ -1,6 +1,7 @@
 import streamlit as st
 from config import CHART_COLOR_PRIMARY, CHART_COLOR_SECONDARY
 
+
 def apply_custom_styles():
     """
     Aplica refinamentos estéticos que o Streamlit não cobre nativamente.
