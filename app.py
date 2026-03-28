@@ -28,8 +28,10 @@ def run_analytical_pipeline(ticker_symbol: str, model_name: str):
     """
     Orquestra a coleta e análise dos dados para um determinado ticker.
     """
-    # 1. Coleta de Dados (Market & News)
+
     with st.status(f"Coletando dados para {ticker_symbol}...", expanded=True) as status:
+
+        # 1. Coleta de Dados (Market & News)
         collector = DataCollector(ticker_symbol)
         data = collector.collect_all_data()
         
@@ -88,11 +90,11 @@ def main():
         run_analytical_pipeline(ticker_symbol, model_name)
     else:
         # Estado de Boas-vindas (Initial State)
-        st.title(f"🏛️ {PROJECT_NAME}")
+        st.title(f"{PROJECT_NAME}")
         st.subheader("Bem-vindo ao Centro de Diligência Hipótese Capital.")
         
         st.markdown(f"""
-            Este terminal foi desenvolvido para auxiliar a equipe de análise na triagem de ativos 
+            Este terminal foi desenvolvido para auxiliar a equipe de análise da Hipótese Capital na triagem de ativos 
             sob a filosofia de **Value Investing**. 
             
             **Como começar:**
@@ -100,8 +102,6 @@ def main():
             2. Selecione o modelo de IA desejado.
             3. Clique em 'Executar Análise de Valor'.
             
-            ---
-            *Versão do Sistema: {VERSION}*
         """)
         
         # Opcional: Mostrar uma imagem inspiradora ou logo centralizado
