@@ -19,9 +19,9 @@ AVAILABLE_MODELS = ["gpt-4o-mini", "gpt-4o"]
 
 # --- ASSETS DE BRANDING ---
 # Mantemos os caminhos para serem usados no código
-LOGO_LIGHT = "branding/Logo Claro.png"
-LOGO_DARK = "branding/Logo escuro.png"
-ICON_BRAND = "branding/Icone_com_fundo.png"
+LOGO_LIGHT = "branding/logo.png"
+LOGO_DARK = "branding/logo_dark.png"
+ICON_BRAND = "branding/icon_bg.png"
 
 # --- CORES PARA GRÁFICOS E ALERTAS ---
 # Usamos essas constantes apenas onde o Streamlit não aplica o tema automaticamente (ex: cores de linhas de gráficos)

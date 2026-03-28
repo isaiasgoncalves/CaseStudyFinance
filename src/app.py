@@ -15,12 +15,12 @@ from ui.components import (
     render_ai_analysis
 )
 
-from config import PROJECT_NAME, VERSION
+from config import PROJECT_NAME, VERSION, ICON_BRAND
 
 # Configuração da Página
 st.set_page_config(
     page_title=PROJECT_NAME,
-    page_icon="🏛️",
+    page_icon=ICON_BRAND,
     layout="wide",
     initial_sidebar_state="expanded"
 )
