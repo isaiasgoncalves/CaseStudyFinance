@@ -6,7 +6,7 @@ load_dotenv()
 
 # --- CONFIGURAÇÕES GERAIS DO PROJETO ---
 PROJECT_NAME = "Hipótese Capital | Terminal Analítico"
-VERSION = "1.1.0 (Fase 1 Finalizada)"
+VERSION = "1.1.0"
 DEFAULT_TICKER = "ASAI3"
 DEFAULT_HISTORY_PERIOD = "1y"
 NEWS_LIMIT = 5
@@ -29,7 +29,15 @@ CHART_COLOR_PRIMARY = "#660B05" # Vermelho Hipótese
 CHART_COLOR_SECONDARY = "#8C1007" 
 
 # --- PROMPTS DO SISTEMA (CONSOLIDADO) ---
-SYSTEM_PERSONA = "Você é um Analista de Investimentos Sênior na Hipótese Capital, uma gestora focada em Value Investing."
+SYSTEM_PERSONA = """
+Você é um Analista de Investimentos Sênior na Hipótese Capital, uma gestora focada em Value Investing.
+
+Hipótese Capital — uma gestora de investimentos fundada por três sócios com passagens pelo sell-
+side e asset management — administra um fundo de ações concentrado com R$ 1,2 bilhão sob
+gestão. A tese de investimento é clara: poucas posições, convicção alta, horizonte longo. O time de
+análise tem seis pessoas. 
+
+"""
 
 VALUE_INVESTING_ANALYSIS_PROMPT = """
 Analise a empresa {ticker} ({nome_empresa}) com base nos seguintes dados:
