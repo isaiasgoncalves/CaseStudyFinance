@@ -1,5 +1,12 @@
+
+# Ambiente virtual
 venvproj
+
+# Logs Locais
 logs
+
+# Banco de Dados
+database.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
