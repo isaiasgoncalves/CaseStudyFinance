@@ -10,6 +10,7 @@ VERSION = "1.0.1"
 DEFAULT_TICKER = "ASAI3"
 DEFAULT_HISTORY_PERIOD = "1y"
 NEWS_LIMIT = 5
+NEWS_MAX_AGE_DAYS = 90  # Filtro de 3 meses para as notícias
 
 # --- CONFIGURAÇÕES DE IA (LLM) ---
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

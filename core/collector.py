@@ -2,7 +2,9 @@ import yfinance as yf
 import pandas as pd
 from curl_cffi import requests as requests_cffi
 from typing import Dict, Optional, Any
-from config import NEWS_LIMIT, DEFAULT_HISTORY_PERIOD
+from datetime import datetime, timezone, timedelta
+from dateutil import parser as date_parser
+from config import NEWS_LIMIT, DEFAULT_HISTORY_PERIOD, NEWS_MAX_AGE_DAYS
 from utils.logger import logger
 
 class DataCollector:
@@ -19,6 +21,29 @@ class DataCollector:
         session = requests_cffi.Session(impersonate="chrome", verify=False)
         
         self.ticker = yf.Ticker(self.ticker_symbol, session=session)
+
+    def _is_recent(self, date_str: str) -> bool:
+        """
+        Verifica se uma data (em string) está dentro do limite configurado.
+        Suporta múltiplos formatos (ISO, RFC 822, etc) via dateutil.
+        """
+        if not date_str:
+            return True # Se não tem data, mantemos por precaução
+            
+        try:
+            publish_date = date_parser.parse(date_str)
+            
+            # Garante que a data seja 'aware' (com timezone) para comparar com o agora
+            if publish_date.tzinfo is None:
+                publish_date = publish_date.replace(tzinfo=timezone.utc)
+            
+            now = datetime.now(timezone.utc)
+            limit = now - timedelta(days=NEWS_MAX_AGE_DAYS)
+            
+            return publish_date >= limit
+        except Exception as e:
+            logger.warning(f"Erro ao parsear data '{date_str}': {e}")
+            return True
 
     def collect_all_data(self) -> Dict[str, Any]:
         """
@@ -68,50 +93,67 @@ class DataCollector:
 
     def _get_recent_news(self, limit: int = NEWS_LIMIT) -> list:
         """
-        Coleta notícias recentes de forma ultra-resiliente, suportando múltiplos 
-        formatos de resposta do Yahoo Finance e fallback para Google News.
+        Coleta notícias recentes filtrando por data de publicação.
         """
         news = []
-        # 1. Tenta Yahoo Finance primeiro
-        try:
-            yf_news = self.ticker.news
-            if yf_news:
-                for n in yf_news:
-                    content = n.get("content", n)
-                    title = content.get("title") or content.get("headline")
-                    link = content.get("canonicalUrl", {}).get("url") or n.get("link", "#")
-                    publisher = content.get("provider", {}).get("displayName") or n.get("publisher", "Yahoo Finance")
 
+        # 1. Tenta Google News RSS primeiro
+        try:
+            clean_ticker = self.ticker_symbol.replace(".SA", "")
+            url = f"https://news.google.com/rss/search?q={clean_ticker}+B3&hl=pt-BR&gl=BR&ceid=BR:pt-419"
+            response = requests_cffi.get(url, impersonate="chrome", verify=False, timeout=10)
+
+            if response.status_code == 200:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(response.content, features="xml")
+                items = soup.find_all("item")
+
+                for item in items:
+                    pub_date_str = item.pubDate.text if item.pubDate else None
+
+                    if not self._is_recent(pub_date_str):
+                        continue
+
+                    title = item.title.text if item.title else None
                     if title:
-                        news.append({"title": str(title), "link": link, "publisher": publisher})
+                        if not any(title[:30] in n["title"] for n in news):
+                            news.append({
+                                "title": str(title),
+                                "link": item.link.text if item.link else "#",
+                                "publisher": item.source.text if item.source else "Google News"
+                            })
                     if len(news) >= limit: break
         except Exception as e:
-            logger.warning(f"Yahoo News falhou: {e}")
+            logger.error(f"Fallback Google News falhou: {e}")
 
-        # 2. Fallback Google News RSS
+
+        # 2. Fallback Yahoo Finance
         if len(news) < limit:
             try:
-                clean_ticker = self.ticker_symbol.replace(".SA", "")
-                url = f"https://news.google.com/rss/search?q={clean_ticker}+B3&hl=pt-BR&gl=BR&ceid=BR:pt-419"
-                response = requests_cffi.get(url, impersonate="chrome", verify=False, timeout=10)
-                
-                if response.status_code == 200:
-                    from bs4 import BeautifulSoup
-                    soup = BeautifulSoup(response.content, features="xml")
-                    items = soup.find_all("item")
-                    
-                    for item in items:
-                        title = item.title.text if item.title else None
+                yf_news = self.ticker.news
+                if yf_news:
+                    for n in yf_news:
+                        content = n.get("content", n)
+                        pub_date_str = content.get("pubDate") or n.get("providerPublishTime")
+
+                        # Se vier como timestamp (inteiro), convertemos para string ISO para o parser
+                        if isinstance(pub_date_str, int):
+                            pub_date_str = datetime.fromtimestamp(pub_date_str, tz=timezone.utc).isoformat()
+
+                        if not self._is_recent(pub_date_str):
+                            continue
+
+                        title = content.get("title") or content.get("headline")
+                        link = content.get("canonicalUrl", {}).get("url") or n.get("link", "#")
+                        publisher = content.get("provider", {}).get("displayName") or n.get("publisher",
+                                                                                            "Yahoo Finance")
+
                         if title:
-                            if not any(title[:30] in n["title"] for n in news):
-                                news.append({
-                                    "title": str(title),
-                                    "link": item.link.text if item.link else "#",
-                                    "publisher": item.source.text if item.source else "Google News"
-                                })
+                            news.append({"title": str(title), "link": link, "publisher": publisher})
                         if len(news) >= limit: break
             except Exception as e:
-                logger.error(f"Fallback Google News falhou: {e}")
+                logger.warning(f"Yahoo News falhou: {e}")
+
 
         return news[:limit]
 
