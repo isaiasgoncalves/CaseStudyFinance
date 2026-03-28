@@ -1,42 +1,54 @@
 import streamlit as st
+from typing import List, Tuple
 from config import LOGO_LIGHT, DEFAULT_TICKER, AVAILABLE_MODELS, VERSION
 
-def render_sidebar():
+def render_sidebar(orchestrator) -> Tuple[str, str, str, bool]:
     """
-    Renderiza a barra lateral com o logo oficial da Hipótese Capital e controles.
+    Renderiza a barra lateral com lógica de atualização imediata do histórico.
     """
     with st.sidebar:
-        # Logo oficial com ajuste automático de largura
         st.image(LOGO_LIGHT, width='stretch')
-        
         st.divider()
         
-        # Seção de Entrada
-        st.subheader("🛠️ Parâmetros de Análise")
+        st.subheader("🛠️ Parâmetros")
         
+        # Campo de Ticker com Session State para ser reativo
+        if "ticker_input" not in st.session_state:
+            st.session_state.ticker_input = DEFAULT_TICKER
+
         ticker = st.text_input(
             "Ticker B3", 
-            value=DEFAULT_TICKER,
-            help="Ex: ASAI3, ITUB4, RECV3",
-            placeholder="Digite o código..."
+            value=st.session_state.ticker_input,
+            key="ticker_field",
+            help="Digite e pressione Enter para atualizar as versões disponíveis.",
+            placeholder="Ex: ASAI3..."
         ).upper()
+
+        # Busca versões disponíveis para este ticker específico
+        history_dates = orchestrator.get_history_options(ticker)
+        
+        options = ["Live (Nova Análise)"]
+        if history_dates:
+            options.extend(history_dates)
+        
+        version = st.selectbox(
+            "Versão da Análise",
+            options,
+            index=0,
+            help="Escolha entre gerar dados novos ou carregar capturas históricas do banco."
+        )
         
         model_name = st.selectbox(
             "Modelo Analítico (LLM)", 
             AVAILABLE_MODELS,
-            index=0,
-            help="Motor de IA para síntese qualitativa."
+            index=0
         )
         
-        st.write("") # Espaçamento
-        analyze_button = st.button("Executar Análise de Valor", width='stretch', type="primary")
+        st.write("")
+        analyze_button = st.button("Executar Diligência", width='stretch', type="primary")
         
-        # Rodapé com informações da versão
-        st.v_spacer = st.container() # Forçar para o fundo se possível (Streamlit simplificado)
         st.markdown("<br>" * 5, unsafe_allow_html=True)
-        
         st.caption("---")
-        st.caption(f"**Hipótese Capital** *Asset Management*")
-        st.caption(f"por *Isaías G. Gonçalves* | Versão {VERSION}")
+        st.caption(f"Terminal Analítico *por Isaías Gouvêa Gonçalves* | Versão {VERSION}")
         
-        return ticker, model_name, analyze_button
+        return ticker, model_name, version, analyze_button
