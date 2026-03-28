@@ -28,7 +28,7 @@ class InvestmentAnalyzer:
         self.model = model or DEFAULT_MODEL
         
         if not self.api_key:
-            logger.error("Chave da OpenAI ausente nas configurações.")
+            logger.error("AN: (API) Chave da OpenAI ausente nas configurações.")
             raise ValueError("OpenAI API Key é obrigatória.")
             
         self.client = OpenAI(api_key=self.api_key)
@@ -44,7 +44,7 @@ class InvestmentAnalyzer:
         Returns:
             Dict[str, Any]: JSON estruturado com a análise ou erro.
         """
-        logger.info(f"Iniciando síntese qualitativa (LLM): {ticker}")
+        logger.info(f"AN: Iniciando síntese qualitativa (LLM): {ticker}")
         
         prompt = self._build_prompt(ticker, data)
         
@@ -63,11 +63,11 @@ class InvestmentAnalyzer:
                 raise ValueError("Resposta da OpenAI veio vazia.")
                 
             analysis = json.loads(content)
-            logger.info(f"Análise LLM concluída para {ticker}")
+            logger.info(f"AN: Análise LLM concluída para {ticker}")
             return analysis
             
         except Exception as e:
-            logger.error(f"Erro na integração com OpenAI ({ticker}): {str(e)}")
+            logger.error(f"AN: (API) Erro na integração com OpenAI ({ticker}): {str(e)}")
             return {"error": f"Não foi possível processar a análise: {str(e)}"}
 
     def _build_prompt(self, ticker: str, data: Dict[str, Any]) -> str:
