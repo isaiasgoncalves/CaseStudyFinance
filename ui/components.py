@@ -37,9 +37,35 @@ def render_price_chart(collector):
     else:
         st.warning("Dados históricos de preço não disponíveis.")
 
-def render_recent_news_list(news_data: list):
-    """Renderiza a lista de notícias coletadas de forma limpa e organizada."""
-    st.header("📰 Notícias Mais Relevantes")
+def _get_sentiment_info(sentiment_class: str):
+    """Retorna o tipo de alerta e ícone baseado na classe de sentimento exata."""
+    cls = str(sentiment_class).strip().capitalize()
+    if cls == "Positivo":
+        return "success", "🚀"
+    if cls == "Negativo":
+        return "error", "⚠️"
+    return "info", "🔍"
+
+def render_recent_news_list(news_data: list, sentiment_analysis: dict = None):
+    """Renderiza a lista de notícias e, opcionalmente, a análise de sentimento da IA."""
+    st.header("📰 Notícias & Sentimento")
+    
+    # Se houver análise de sentimento, exibe um card de destaque antes das notícias
+    if sentiment_analysis and isinstance(sentiment_analysis, dict):
+        classe = sentiment_analysis.get("classe", "Neutro")
+        analise = sentiment_analysis.get("analise", "")
+        stype, icon = _get_sentiment_info(classe)
+        
+        with st.container():
+            if stype == "success":
+                st.success(f"**Sentimento IA: {classe}** {icon}\n\n{analise}")
+            elif stype == "error":
+                st.error(f"**Sentimento IA: {classe}** {icon}\n\n{analise}")
+            else:
+                st.info(f"**Sentimento IA: {classe}** {icon}\n\n{analise}")
+    
+    st.write("---")
+    
     if not news_data:
         st.info("Nenhuma notícia recente encontrada para este ativo.")
         return
@@ -47,42 +73,24 @@ def render_recent_news_list(news_data: list):
     for n in news_data[:5]:
         with st.expander(f"**{n.get('title', 'Sem título')}**", expanded=False):
             st.write(f"*Fonte: {n.get('publisher', 'Fonte desconhecida')}*")
-            st.link_button("Ler Notícia Completa", n.get('link', '#'))
-
-def _get_sentiment_info(sentiment_text: str):
-    """Retorna o tipo de alerta e ícone baseado no sentimento."""
-    text = sentiment_text.lower()
-    if "positivo" in text or "positiva" in text:
-        return "success", "🚀"
-    if "negativo" in text or "negativa" in text:
-        return "error", "⚠️"
-    return "info", "🔍"
+            st.link_button("Ler Notícia Completa", n.get('link', '#'), width='stretch')
 
 def render_ai_analysis(analysis: dict):
-    """Exibe a síntese gerada pelo LLM sob a ótica de Value Investing."""
+    """Exibe a síntese gerada pelo LLM focada no modelo de negócio e riscos."""
     st.header("🏛️ Síntese do Comitê de Análise")
     
-    tab1, tab2, tab3 = st.tabs(["Resumo e Tese", "Análise de Risco", "Checklist Investigativo"])
+    tab1, tab2 = st.tabs(["Resumo e Tese", "Questões Investigativas"])
     
     with tab1:
         st.subheader("📌 Resumo do Modelo de Negócio")
         st.write(analysis.get("resumo_negocio", "N/A"))
         
-        sentiment_text = analysis.get("sentimento_noticias", "Neutro")
-        stype, icon = _get_sentiment_info(sentiment_text)
+        st.divider()
         
-        if stype == "success":
-            st.success(f"**Clima das Notícias:** {sentiment_text}", icon=icon)
-        elif stype == "error":
-            st.error(f"**Clima das Notícias:** {sentiment_text}", icon=icon)
-        else:
-            st.info(f"**Clima das Notícias:** {sentiment_text}", icon=icon)
-
-    with tab2:
         st.subheader("⚖️ Análise de Valor & Downside")
         st.markdown(f"> {analysis.get('analise_indicadores', 'N/A')}")
 
-    with tab3:
+    with tab2:
         st.subheader("❓ Perguntas para o RI (Relação com Investidores)")
         for i, q in enumerate(analysis.get("perguntas_investigativas", []), 1):
             st.info(f"**{i}.** {q}")

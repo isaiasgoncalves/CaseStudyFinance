@@ -6,7 +6,7 @@ load_dotenv()
 
 # --- CONFIGURAÇÕES GERAIS DO PROJETO ---
 PROJECT_NAME = "Hipótese Capital | Terminal Analítico"
-VERSION = "1.0.1 (Fase 1 Refinada)"
+VERSION = "1.0.1"
 DEFAULT_TICKER = "ASAI3"
 DEFAULT_HISTORY_PERIOD = "1y"
 NEWS_LIMIT = 5
@@ -54,7 +54,9 @@ Você deve agir como um Analista Sênior da Hipótese Capital. Sua filosofia é 
 Gere um JSON com as seguintes chaves:
 1. "resumo_negocio": Uma síntese concisa do modelo de geração de valor (2-3 frases).
 2. "analise_indicadores": Interpretação qualitativa. O que esses números dizem sobre a saúde do negócio e a proteção de downside? Seja crítico.
-3. "sentimento_noticias": Analise o impacto das notícias recentes no valor intrínseco. Classifique como positiva, negativa ou neutra.
+3. "sentimento_noticias": Um objeto contendo:
+    - "classe": Apenas uma palavra: "Positivo", "Negativo" ou "Neutro".
+    - "analise": Texto analisando o impacto das notícias recentes no valor intrínseco.
 4. "perguntas_investigativas": Três perguntas cruciais que desafiem a tese de investimento, voltadas para o RI da empresa.
 
 O tom deve ser técnico, direto e focado em preservação de capital.

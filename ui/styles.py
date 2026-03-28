@@ -3,20 +3,29 @@ from config import CHART_COLOR_PRIMARY, CHART_COLOR_SECONDARY
 
 def apply_custom_styles():
     """
-    Aplica refinamentos estéticos mínimos que o Streamlit não cobre nativamente via config.toml.
-    Focado em polimento visual.
+    Aplica refinamentos estéticos que o Streamlit não cobre nativamente.
+    Combina 'Playfair Display' (Serif) para títulos e 'Source Sans Pro' (Sans) para corpo.
     """
     st.markdown(f"""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@400;600&display=swap');
 
-        /* Ajustes finos de tipografia */
-        h1, h2, h3, .stTitle {{
+        /* --- TIPOGRAFIA DE AUTORIDADE (SERIF) --- */
+        h1, h2, h3, .stTitle, [data-testid="stMetricValue"]  {{
             font-family: 'Playfair Display', serif !important;
             font-weight: 700 !important;
         }}
         
-        /* Estilização refinada para botões */
+        /* Ajuste fino para métricas (Rótulos em Sans para clareza) */
+        [data-testid="stMetricLabel"] {{
+            font-family: 'Source Sans Pro', sans-serif !important;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-size: 0.75rem !important;
+            opacity: 0.8;
+        }}
+
+        /* --- POLIMENTO VISUAL --- */
         .stButton > button {{
             border-radius: 4px !important;
             text-transform: uppercase;
@@ -30,7 +39,6 @@ def apply_custom_styles():
             border-color: {CHART_COLOR_SECONDARY} !important;
         }}
 
-        /* Cards de Métricas com bordas suaves */
         [data-testid="stMetric"] {{
             border: 1px solid rgba(255, 240, 196, 0.1) !important;
             padding: 15px !important;
@@ -38,11 +46,14 @@ def apply_custom_styles():
             background-color: rgba(255, 240, 196, 0.02) !important;
         }}
 
-        [data-testid="stMetricLabel"] {{
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            font-size: 0.75rem !important;
-            opacity: 0.8;
+        /* Ajuste de cor para links (evitar azul padrão que distoa do vermelho) */
+        a {{
+            color: {CHART_COLOR_SECONDARY} !important;
+            text-decoration: none;
+            font-weight: 600;
+        }}
+        a:hover {{
+            text-decoration: underline;
         }}
 
         </style>

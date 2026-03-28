@@ -64,7 +64,10 @@ def run_analytical_pipeline(ticker_symbol: str, model_name: str):
         render_ai_analysis(analysis)
         
     with col_right:
-        render_recent_news_list(data.get("news", []))
+        render_recent_news_list(
+            data.get("news", []), 
+            sentiment_analysis=analysis.get("sentimento_noticias")
+        )
         
         # Disclaimer Legal (Padrão Financeiro)
         st.divider()
