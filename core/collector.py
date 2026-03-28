@@ -59,7 +59,7 @@ class DataCollector:
             
             return publish_date >= limit
         except Exception as e:
-            logger.warning(f"Falha ao validar data '{date_str}': {e}")
+            logger.warning(f"CL: Falha ao validar data da notícia'{date_str}': {e}")
             return True
 
     def collect_all_data(self) -> Dict[str, Any]:
@@ -69,14 +69,14 @@ class DataCollector:
         Returns:
             Dict[str, Any]: Dicionário contendo cadastral, market_indicators e news.
         """
-        logger.info(f"Iniciando extração: {self.ticker_symbol}")
+        logger.info(f"CL: Iniciando extração: {self.ticker_symbol}")
         
         try:
             # Otimização: Pegamos o info uma única vez
             info = self.ticker.info
             
             if not info or 'symbol' not in info:
-                logger.error(f"Ticker {self.ticker_symbol} inválido ou deslistado.")
+                logger.error(f"CL: (API) Ticker {self.ticker_symbol} inválido ou deslistado.")
                 return {}
 
             return {
@@ -86,7 +86,7 @@ class DataCollector:
             }
             
         except Exception as e:
-            logger.error(f"Falha catastrófica na coleta ({self.ticker_symbol}): {str(e)}")
+            logger.error(f"CL: Falha catastrófica na coleta ({self.ticker_symbol}): {str(e)}")
             return {}
 
     def _get_cadastral_data(self, info: Dict[str, Any]) -> Dict[str, str]:
@@ -141,7 +141,7 @@ class DataCollector:
                         })
                     if len(news) >= limit: break
         except Exception as e:
-            logger.warning(f"Yahoo News indisponível: {e}")
+            logger.warning(f"CL: (API) Yahoo News indisponível: {e}")
 
         # 2. Fallback Google News (RSS)
         if len(news) < limit:
@@ -166,7 +166,7 @@ class DataCollector:
                             })
                         if len(news) >= limit: break
             except Exception as e:
-                logger.error(f"Google News Fallback falhou: {e}")
+                logger.error(f"CL: (API) Google News Fallback falhou: {e}")
 
         return news[:limit]
 
