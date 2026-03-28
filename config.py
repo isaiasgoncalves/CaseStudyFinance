@@ -6,8 +6,8 @@ load_dotenv()
 
 # --- CONFIGURAÇÕES GERAIS DO PROJETO ---
 PROJECT_NAME = "Hipótese Capital | Terminal Analítico"
-VERSION = "1.1.0"
-DEFAULT_TICKER = "ASAI3"
+VERSION = "2.0"
+DEFAULT_TICKER = "ITUB4"
 DEFAULT_HISTORY_PERIOD = "1y"
 NEWS_LIMIT = 5
 NEWS_MAX_AGE_DAYS = 90  # Filtro de 3 meses para as notícias
@@ -27,6 +27,16 @@ ICON_BRAND = "branding/Icone_com_fundo.png"
 # Usamos essas constantes apenas onde o Streamlit não aplica o tema automaticamente (ex: cores de linhas de gráficos)
 CHART_COLOR_PRIMARY = "#660B05" # Vermelho Hipótese
 CHART_COLOR_SECONDARY = "#8C1007" 
+
+# --- TEXTOS E DESCRIÇÕES (TOOLTIPS) ---
+INDICATOR_TOOLTIPS = {
+    "price": "Preço atual ou de fechamento do ativo na data da captura.",
+    "p_l": "Preço/Lucro: Indica quanto o mercado está disposto a pagar por cada real de lucro da empresa.",
+    "roe": "Return on Equity: Mede a rentabilidade da empresa em relação ao seu patrimônio líquido.",
+    "net_margin": "Margem Líquida: Indica a porcentagem de lucro em relação à receita total.",
+    "dy": "Dividend Yield: Rendimento gerado por dividendos em relação ao preço da ação.",
+    "debt_ebitda": "Dívida Líquida/EBITDA: Mede a alavancagem e a capacidade de pagamento da dívida da empresa."
+}
 
 # --- PROMPTS DO SISTEMA (CONSOLIDADO) ---
 SYSTEM_PERSONA = """
