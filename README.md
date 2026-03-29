@@ -62,11 +62,32 @@ OPENAI_API_KEY=sua_chave_aqui
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-### 4. Execução
-Para iniciar o terminal analítico:
+### 4. Execução Manual
+Para iniciar o terminal analítico localmente:
 ```bash
 streamlit run src/app.py
 ```
+
+---
+
+## 🐳 Execução via Docker (Recomendado para Deploy)
+
+Para rodar a aplicação em um container isolado (ideal para VPS ou servidores de produção):
+
+### 1. Pré-requisitos
+Certifique-se de ter o **Docker** e o **Docker Compose** instalados na máquina.
+
+### 2. Subir o Container
+Na raiz do projeto, execute:
+```bash
+docker-compose up -d --build
+```
+
+### 3. Acessibilidade & Persistência
+- A aplicação estará disponível em `http://localhost:8501`.
+- O banco de dados `database.db` está mapeado como um volume na raiz do projeto, garantindo que seu histórico seja preservado mesmo após reinicializações do container.
+
+---
 
 ### 5. Execução de Testes
 Para garantir a integridade do sistema:
