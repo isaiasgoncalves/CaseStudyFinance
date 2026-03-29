@@ -84,19 +84,63 @@ Agora você pode acessar o terminal através do seu domínio:
 
 ---
 
-## 6. (Opcional) SSL e HTTPS com Nginx Proxy Manager
+## 6. Exposição com Nginx e SSL (Certbot)
 
-Para um deploy verdadeiramente profissional (sem o `:8501` no final e com cadeado de segurança), recomenda-se usar um **Reverse Proxy**.
+Para acessar via `https://hipotesecapital.duckdns.org` (sem a porta 8501 e com segurança), siga estes passos:
 
-### Passos rápidos:
-1. Instale o **Nginx Proxy Manager** via Docker.
-2. No painel dele, adicione um **Proxy Host**:
-   - Domain Name: `hipotesecapital.duckdns.org`
-   - Scheme: `http`
-   - Forward IP: `IP_INTERNO_DOCKER` ou `IP_DA_VPS`
-   - Forward Port: `8501`
-   - Habilite **Websockets Support** (Obrigatório para Streamlit).
-3. Solicite o certificado SSL (Let's Encrypt) pelo próprio painel.
+### 1. Instalar Nginx e Certbot
+```bash
+sudo apt install nginx python3-certbot-nginx -y
+```
+
+### 2. Abrir Portas de Web Padrão
+```bash
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw delete allow 8501/tcp  # Opcional: fecha a porta direta para forçar o uso do Nginx
+```
+
+### 3. Configurar o Nginx para Streamlit
+Crie um arquivo de configuração para o seu domínio:
+```bash
+sudo nano /etc/nginx/sites-available/hipotesecapital
+```
+
+Cole o conteúdo abaixo (ajuste o IP se necessário):
+```nginx
+server {
+    listen 80;
+    server_name hipotesecapital.duckdns.org;
+
+    location / {
+        proxy_pass http://127.0.0.1:8501;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Configurações essenciais para WebSockets (Streamlit)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+}
+```
+
+### 4. Ativar a Configuração
+```bash
+sudo ln -s /etc/nginx/sites-available/hipotesecapital /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### 5. Gerar Certificado SSL Gratuito (HTTPS)
+```bash
+sudo certbot --nginx -d hipotesecapital.duckdns.org
+```
+- Siga as instruções na tela (coloque seu e-mail e aceite os termos).
+- Escolha a opção **2 (Redirect)** para forçar todo o tráfego para HTTPS.
 
 ---
 
