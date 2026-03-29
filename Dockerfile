@@ -22,6 +22,9 @@ COPY requirements.txt .
 # Instala as dependências Python
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Cria diretório de dados
+RUN mkdir -p /app/data
+
 # Copia o restante do código da aplicação
 COPY . .
 

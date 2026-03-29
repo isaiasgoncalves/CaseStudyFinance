@@ -15,7 +15,7 @@ from ui.components import (
     render_ai_analysis
 )
 
-from config import PROJECT_NAME, VERSION, ICON_BRAND
+from config import PROJECT_NAME, VERSION, ICON_BRAND, DB_PATH
 
 # Configuração da Página
 st.set_page_config(
@@ -25,9 +25,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Singleton do Orquestrador
+# Singleton do Orquestrador (Injetando DB_PATH)
 if "orchestrator" not in st.session_state:
-    st.session_state.orchestrator = AnalyticalOrchestrator()
+    from core.database import DatabaseManager
+    db_manager = DatabaseManager(db_path=DB_PATH)
+    st.session_state.orchestrator = AnalyticalOrchestrator(db=db_manager)
 
 def main():
     apply_custom_styles()
