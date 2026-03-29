@@ -6,7 +6,7 @@ load_dotenv()
 
 # --- CONFIGURAÇÕES GERAIS DO PROJETO ---
 PROJECT_NAME = "Hipótese Capital | Terminal Analítico"
-VERSION = "2.0.0 (Docker Ready)"
+VERSION = "2.0.1"
 DEFAULT_TICKER = "ASAI3"
 DEFAULT_HISTORY_PERIOD = "1y"
 NEWS_LIMIT = 5
