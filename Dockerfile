@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
 # Instala dependências do sistema necessárias para compilação de alguns pacotes python
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt update && apt install -y --no-install-recommends \
     build-essential \
     curl \
     software-properties-common \
