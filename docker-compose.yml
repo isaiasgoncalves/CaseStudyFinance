@@ -1,0 +1,14 @@
+services:
+  finance-terminal:
+    build: .
+    container_name: hipotese-terminal
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - ./database.db:/app/database.db
+    restart: unless-stopped
+
+volumes:
+  db_data:
