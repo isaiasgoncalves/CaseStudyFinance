@@ -21,7 +21,7 @@ A ideia é ser uma **caixa de ferramentas** para **analistas do mercado financei
 ## Como utilizar
 O sistema automatiza a coleta e armazenamento de dados a partir de um Ticker da B3 e exibe as análises em um dashboard interativo.
 
-A aplicação estará temporariamente disponível no link [https:/hipotesecapital.duckdns.org](https:/hipotesecapital.duckdns.org), mas também pode ser executada localmente _(Para isso, veja as instruções de como Executar)_.
+A aplicação estará temporariamente disponível no link _https:/hipotesecapital.duckdns.org_, mas também pode ser executada localmente _(Para isso, veja as instruções de como Executar)_.
 Ao abrir o terminal, a interface mostrada será esta:
 
 
